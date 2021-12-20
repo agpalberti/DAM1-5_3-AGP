@@ -15,7 +15,7 @@ class Agenda() {
     fun consultaNumero(numero: String): Contacto? =
         listaDeContactos.find { contacto -> contacto.numero.filter { !it.isWhitespace() } == numero.filter { !it.isWhitespace() } }
 
-    fun consultaNombre(nombre: String): Contacto? = listaDeContactos.find { it.nombre == nombre }
+    fun consultaNombre(nombre: String): Contacto? = listaDeContactos.find { it.nombre.uppercase() == nombre.uppercase() }
 }
 
 class Contacto(nombre: String) {
@@ -61,7 +61,7 @@ fun main() {
             if (input[0].isDigit() || input[0] == '+') {
                 val consulta = agenda.consultaNumero(input)
                 if (consulta != null) {
-                    println("El número pertenece a ${consulta.nombre}")
+                    println("Este número pertenece a ${consulta.nombre}.")
                 } else {
                     println("Contacto no encontrado. Introduzca el nombre para registrarlo.")
                     try {
@@ -75,7 +75,7 @@ fun main() {
             } else if (command.first() !in listaComandos) {
                 val consulta = agenda.consultaNombre(input)
                 if (consulta != null) {
-                    println("El número pertenece a ${consulta.nombre}")
+                    println("El número de ${command.first()} es ${consulta.numero}.")
                 } else {
                     println("Contacto no encontrado. Introduzca el número para registrarlo.")
                     try {
@@ -89,14 +89,21 @@ fun main() {
             } else when (command.first()) {
                 "adios" -> salir = true
                 "listado" -> {
-                    println("Lista de contactos:\n")
-                    agenda.listado().forEach { println("- $it") }
+                    val listaContactos = agenda.listado()
+                    if (listaContactos.isNotEmpty()) {
+                        println("Lista de contactos:")
+                        listaContactos.forEach { println("- $it") }
+                    } else println("No hay contactos registrados.")
                 }
                 "filtra" -> {
                     if (command.size > 1) {
-                        val filtro =
-                            println("Lista de contactos filtrados por \" ")
-                    }
+                        val filtro = command[1]
+                        val agendaFiltrada = agenda.filtra(filtro)
+                        if (agendaFiltrada.isNotEmpty()) {
+                            println("Lista de contactos filtrados por \"$filtro\" ")
+                            agendaFiltrada.forEach { println("- $it") }
+                        } else println("No se han encontrado contactos según ese filtro.")
+                    } else println("No has introducido nada después del comando filtra.")
                 }
                 "ayuda" -> {
                     println(
@@ -108,7 +115,7 @@ fun main() {
                 else -> {
                 }
             }
-        }
+        } else println("No has introducido nada.")
 
     }
 }
