@@ -10,7 +10,7 @@ class Agenda() {
 
     fun listado(): List<Contacto> = listaDeContactos.sortedBy { it.nombre }
 
-    fun filtra(texto: String): List<Contacto> = listaDeContactos.filter { texto in it.nombre }
+    fun filtra(texto: String): List<Contacto> = listaDeContactos.filter { texto.uppercase() in it.nombre.uppercase() }
 
     fun consultaNumero(numero: String): Contacto? =
         listaDeContactos.find { contacto -> contacto.numero.filter { !it.isWhitespace() } == numero.filter { !it.isWhitespace() } }
@@ -27,7 +27,7 @@ class Contacto(nombre: String) {
 
     var numero: String = ""
         set(value) {
-            if ((value[0] == '+' || value[0].isDigit()) && value.subSequence(1, value.length - 1)
+            if ((value[0] == '+' || value[0].isDigit()) && value.subSequence(1, value.length)
                     .all { it.isDigit() || it == ' ' }
             ) {
                 field = value
@@ -61,29 +61,29 @@ fun main() {
             if (input[0].isDigit() || input[0] == '+') {
                 val consulta = agenda.consultaNumero(input)
                 if (consulta != null) {
-                    println("Este número pertenece a ${consulta.nombre}.")
+                    println("\nEste número pertenece a ${consulta.nombre}.")
                 } else {
-                    println("Contacto no encontrado. Introduzca el nombre para registrarlo.")
+                    println("\nContacto no encontrado. Introduzca el nombre para registrarlo.")
                     try {
                         val nombre = readLine() ?: ""
                         agenda.add(Contacto(nombre, input))
-                        println("Contacto agregado de forma correcta.")
+                        println("\nContacto agregado de forma correcta.")
                     } catch (_: Exception) {
-                        println("Se ha introducido algún dato de forma incorrecta. Operación cancelada.")
+                        println("\nSe ha introducido algún dato de forma incorrecta. Operación cancelada.")
                     }
                 }
             } else if (command.first() !in listaComandos) {
                 val consulta = agenda.consultaNombre(input)
                 if (consulta != null) {
-                    println("El número de ${command.first()} es ${consulta.numero}.")
+                    println("\nEl número de ${consulta.nombre} es ${consulta.numero}.")
                 } else {
-                    println("Contacto no encontrado. Introduzca el número para registrarlo.")
+                    println("\nContacto no encontrado. Introduzca el número para registrarlo.")
                     try {
                         val numero = readLine() ?: ""
                         agenda.add(Contacto(input, numero))
-                        println("Contacto agregado de forma correcta.")
+                        println("\nContacto agregado de forma correcta.")
                     } catch (_: Exception) {
-                        println("Se ha introducido algún dato de forma incorrecta. Operación cancelada.")
+                        println("\nSe ha introducido algún dato de forma incorrecta. Operación cancelada.")
                     }
                 }
             } else when (command.first()) {
@@ -91,19 +91,19 @@ fun main() {
                 "listado" -> {
                     val listaContactos = agenda.listado()
                     if (listaContactos.isNotEmpty()) {
-                        println("Lista de contactos:")
+                        println("\nLista de contactos:")
                         listaContactos.forEach { println("- $it") }
-                    } else println("No hay contactos registrados.")
+                    } else println("\nNo hay contactos registrados.")
                 }
                 "filtra" -> {
                     if (command.size > 1) {
                         val filtro = command[1]
                         val agendaFiltrada = agenda.filtra(filtro)
                         if (agendaFiltrada.isNotEmpty()) {
-                            println("Lista de contactos filtrados por \"$filtro\" ")
+                            println("\nLista de contactos filtrados por \"$filtro\" ")
                             agendaFiltrada.forEach { println("- $it") }
-                        } else println("No se han encontrado contactos según ese filtro.")
-                    } else println("No has introducido nada después del comando filtra.")
+                        } else println("\nNo se han encontrado contactos según ese filtro.")
+                    } else println("\nNo has introducido nada después del comando filtra.")
                 }
                 "ayuda" -> {
                     println(
@@ -112,10 +112,8 @@ fun main() {
                                 "\n- filtra \"texto_a_buscar\" : Muestra el listado de los contactos que contengan \"texto_a_buscar\""
                     )
                 }
-                else -> {
-                }
             }
-        } else println("No has introducido nada.")
+        } else println("\nNo has introducido nada.")
 
     }
 }
